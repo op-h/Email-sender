@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Send Score Email</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 24px;
+      color: #2c3e50;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #444;
+      font-size: 0.9rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="email"] {
+      width: 100%;
+      padding: 10px 12px;
+      margin-bottom: 18px;
+      border: 1.5px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="email"]:focus {
+      border-color: #2c3e50;
+      outline: none;
+    }
+
+    button {
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      padding: 14px 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 8px;
+      width: 100%;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #1a2733;
+    }
+
+    .status {
+      margin-top: 20px;
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+  </style>
+  <script>
+    (function() {
+      emailjs.init("O6m-i3ZUSyhafKlxO"); // Your User ID
+    })();
+
+    function sendEmail() {
+      const studentName = document.getElementById("studentName").value.trim();
+      const subject = document.getElementById("subject").value.trim();
+      const score = parseFloat(document.getElementById("score").value);
+      const total = parseFloat(document.getElementById("total").value);
+      const toEmail = document.getElementById("toEmail").value.trim();
+
+      if (!studentName || !subject || !toEmail || isNaN(score) || isNaN(total)) {
+        alert("Please fill all fields with valid values.");
+        return;
+      }
+
+      const percent = Math.round((score / total) * 100);
+      const status = percent >= 60 ? "PASS" : "FAIL";
+
+      emailjs.send("service_483ihhr", "template_ex79ptb", {
+        to_email: toEmail,
+        student_name: studentName,
+        subject: subject,
+        score: score,
+        total: total,
+        percent: percent,
+        status: status
+      }).then(function(response) {
+        document.querySelector(".status").textContent = "✅ Email sent successfully!";
+      }, function(error) {
+        document.querySelector(".status").textContent = "❌ Failed to send email: " + error.text;
+      });
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h2>Send Score Email</h2>
+    <label for="toEmail">Recipient Email</label>
+    <input type="email" id="toEmail" placeholder="recipient@example.com" required />
+
+    <label for="studentName">Student Name</label>
+    <input type="text" id="studentName" placeholder="Hussein Ziya" required />
+
+    <label for="subject">Subject</label>
+    <input type="text" id="subject" placeholder="Cybersecurity Fundamentals" required />
+
+    <label for="score">Score</label>
+    <input type="number" id="score" placeholder="9" min="0" required />
+
+    <label for="total">Total Points</label>
+    <input type="number" id="total" placeholder="20" min="1" required />
+
+    <button onclick="sendEmail()">Send Email</button>
+    <div class="status"></div>
+  </div>
+</body>
+</html>
