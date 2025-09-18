@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale-1.0">
     <title>QR Code Generator</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -96,6 +96,10 @@
         </div>
     </div>
 
+    <footer class="absolute bottom-0 left-0 right-0 p-4 text-center text-sm text-slate-500 dark:text-slate-400">
+        Designed by OPH
+    </footer>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const qrForm = document.getElementById('qrForm');
@@ -162,7 +166,6 @@
                 }
             };
             
-            // --- MODIFIED & IMPROVED FUNCTION FOR BLIND EFFECT ---
             const generateQRCode = (text, filename, label = '') => {
                 clearQRCode();
                 qrcode = new QRCode(qrcodeDiv, {
@@ -176,8 +179,7 @@
                     if (label) {
                         const qrCanvas = qrcodeDiv.querySelector('canvas');
                         const qrImg = qrcodeDiv.querySelector('img');
-
-                        let baseImageElement = qrCanvas || qrImg; // Get the QR code source
+                        let baseImageElement = qrCanvas || qrImg;
 
                         if (baseImageElement) {
                             const finalCanvas = document.createElement('canvas');
@@ -185,32 +187,26 @@
                             finalCanvas.height = 256;
                             const ctx = finalCanvas.getContext('2d');
                             
-                            // 1. Draw the QR code onto our new canvas
                             ctx.drawImage(baseImageElement, 0, 0, 256, 256);
 
-                            // 2. Prepare text styling
                             const fontSize = 16;
                             ctx.font = `bold ${fontSize}px 'Inter'`;
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'middle';
                             
-                            // 3. Calculate text and background dimensions
                             const textMetrics = ctx.measureText(label);
-                            const padding = 15; // Padding around the text
+                            const padding = 15;
                             const rectWidth = textMetrics.width + padding * 2;
-                            const rectHeight = fontSize + padding; // Height based on font size + padding
+                            const rectHeight = fontSize + padding;
                             const rectX = (finalCanvas.width - rectWidth) / 2;
                             const rectY = (finalCanvas.height - rectHeight) / 2;
 
-                            // 4. Draw a semi-transparent background rectangle
-                            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // White with 70% opacity
+                            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
                             ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
                             
-                            // 5. Draw the text
-                            ctx.fillStyle = '#0f172a'; // Use a dark color for the text
+                            ctx.fillStyle = '#0f172a';
                             ctx.fillText(label, finalCanvas.width / 2, finalCanvas.height / 2);
 
-                            // Replace the original QR code with our new canvas
                             qrcodeDiv.innerHTML = '';
                             qrcodeDiv.appendChild(finalCanvas);
                         }
@@ -233,10 +229,10 @@
                 if (currentMode === 'url') {
                     const url = urlInput.value.trim();
                     if (url) {
-                        let label = 'URL'; // Default label for URL
+                        let label = 'URL';
                         try {
                             label = new URL(url).hostname.replace(/^www\./, '');
-                            if (label.length > 15) label = label.substring(0, 12) + '...'; // Truncate long labels
+                            if (label.length > 15) label = label.substring(0, 12) + '...';
                         } catch (_) {}
                         generateQRCode(url, `${label}.png`, label);
                     }
@@ -246,7 +242,7 @@
                         const wifiString = `WIFI:T:${encryptionSelect.value};S:${escapeWifiString(ssid)};P:${escapeWifiString(passwordInput.value)};H:${hiddenCheckbox.checked};;`;
                         const filename = `wifi-${ssid.replace(/\s/g, '_')}.png`;
                         let label = ssid;
-                        if (label.length > 15) label = label.substring(0, 12) + '...'; // Truncate long labels
+                        if (label.length > 15) label = label.substring(0, 12) + '...';
                         generateQRCode(wifiString, filename, label);
                     }
                 } else if (currentMode === 'contact') {
@@ -259,7 +255,7 @@
                         const vCardString = `BEGIN:VCARD\nVERSION:3.0\nN:${lastName};${firstName};;;\nFN:${fullName}\nTEL;TYPE=CELL,VOICE:${phone}\nEND:VCARD`;
                         const filename = `contact-${fullName.replace(/\s/g, '_')}.png`;
                         let label = fullName;
-                        if (label.length > 15) label = label.substring(0, 12) + '...'; // Truncate long labels
+                        if (label.length > 15) label = label.substring(0, 12) + '...';
                         generateQRCode(vCardString, filename, label);
                     }
                 }
