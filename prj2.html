@@ -3,36 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>URL to QR Code Converter</title>
+    <title>QR Code Generator</title>
     
-    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- QR Code generation library -->
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
     
-    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Custom styles to apply the Inter font */
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Style for the QR code canvas to ensure it's centered and responsive */
-        #qrcode canvas {
+        body { font-family: 'Inter', sans-serif; }
+        #qrcode canvas, #qrcode img {
             width: 100% !important;
             height: auto !important;
-            max-width: 256px; /* QR code max size */
+            max-width: 256px;
             margin: 0 auto;
         }
-        #qrcode img {
-            width: 100% !important;
-            height: auto !important;
-            max-width: 256px; /* QR code max size */
-            margin: 0 auto;
+        .tab-active {
+            background-color: #4f46e5 !important; /* indigo-600 */
+            color: white !important;
         }
     </style>
 </head>
@@ -41,24 +32,49 @@
     <div class="w-full max-w-md mx-auto">
         <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl shadow-slate-400/20 dark:shadow-black/40 p-6 md:p-8">
             
-            <!-- Header -->
-            <div class="text-center mb-8">
-                <h1 class="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">URL to QR Code Converter</h1>
-                <p class="text-slate-500 dark:text-slate-400 mt-2">Instantly generate a QR code from any web link.</p>
+            <div class="text-center mb-6">
+                <h1 class="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white">QR Code Generator</h1>
+                <p class="text-slate-500 dark:text-slate-400 mt-2">Create QR codes for URLs, Wi-Fi, and Contacts.</p>
             </div>
 
-            <!-- Input Form -->
+            <div class="grid grid-cols-3 gap-2 mb-6 bg-slate-200 dark:bg-slate-700 p-1 rounded-lg">
+                <button id="urlTab" class="tab-btn tab-active px-4 py-2 rounded-md font-semibold text-sm transition-colors duration-300">URL</button>
+                <button id="wifiTab" class="tab-btn px-4 py-2 rounded-md font-semibold text-sm transition-colors duration-300 text-slate-600 dark:text-slate-300">Wi-Fi</button>
+                <button id="contactTab" class="tab-btn px-4 py-2 rounded-md font-semibold text-sm transition-colors duration-300 text-slate-600 dark:text-slate-300">Contact</button>
+            </div>
+
             <form id="qrForm" class="space-y-4">
-                <div>
+                <div id="urlSection">
                     <label for="urlInput" class="sr-only">Enter URL</label>
                     <input type="url" id="urlInput" placeholder="https://example.com" required class="w-full px-4 py-3 bg-slate-100 dark:bg-slate-700 border-2 border-transparent focus:border-indigo-500 dark:focus:border-indigo-500 rounded-lg text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-0 transition-colors duration-300">
                 </div>
+
+                <div id="wifiSection" class="hidden space-y-4">
+                    <input type="text" id="ssidInput" placeholder="Network Name (SSID)" class="w-full px-4 py-3 bg-slate-100 dark:bg-slate-700 border-2 border-transparent focus:border-indigo-500 dark:focus:border-indigo-500 rounded-lg text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-0 transition-colors duration-300">
+                    <input type="password" id="passwordInput" placeholder="Password" class="w-full px-4 py-3 bg-slate-100 dark:bg-slate-700 border-2 border-transparent focus:border-indigo-500 dark:focus:border-indigo-500 rounded-lg text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-0 transition-colors duration-300">
+                    <div class="grid grid-cols-2 gap-4">
+                        <select id="encryptionSelect" class="w-full px-4 py-3 bg-slate-100 dark:bg-slate-700 border-2 border-transparent focus:border-indigo-500 dark:focus:border-indigo-500 rounded-lg text-slate-800 dark:text-white focus:outline-none focus:ring-0 transition-colors duration-300">
+                            <option value="WPA">WPA/WPA2</option>
+                            <option value="WEP">WEP</option>
+                            <option value="nopass">None</option>
+                        </select>
+                        <div class="flex items-center justify-center bg-slate-100 dark:bg-slate-700 rounded-lg px-4 border-2 border-transparent">
+                            <input id="hiddenCheckbox" type="checkbox" class="h-4 w-4 rounded text-indigo-600 focus:ring-indigo-500 border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800">
+                            <label for="hiddenCheckbox" class="ml-3 block text-sm font-medium text-slate-700 dark:text-slate-300">Hidden</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="contactSection" class="hidden space-y-4">
+                    <input type="text" id="nameInput" placeholder="Full Name (e.g., John Doe)" class="w-full px-4 py-3 bg-slate-100 dark:bg-slate-700 border-2 border-transparent focus:border-indigo-500 dark:focus:border-indigo-500 rounded-lg text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-0 transition-colors duration-300">
+                    <input type="tel" id="phoneInput" placeholder="Phone Number (e.g., +11234567890)" class="w-full px-4 py-3 bg-slate-100 dark:bg-slate-700 border-2 border-transparent focus:border-indigo-500 dark:focus:border-indigo-500 rounded-lg text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-0 transition-colors duration-300">
+                </div>
+
                 <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg focus:outline-none focus:ring-4 focus:ring-indigo-600/50 transition-all duration-300 transform hover:scale-105">
                     Generate QR Code
                 </button>
             </form>
 
-            <!-- QR Code Display Area -->
             <div id="qr-container" class="mt-8 text-center hidden">
                 <div id="qrcode-wrapper" class="bg-white p-4 rounded-lg inline-block shadow-inner dark:bg-slate-700">
                     <div id="qrcode"></div>
@@ -66,7 +82,6 @@
                 <p id="qr-filename" class="text-sm text-slate-500 dark:text-slate-400 mt-2 truncate"></p>
             </div>
             
-            <!-- Action Buttons -->
             <div id="action-buttons" class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
                  <button id="downloadBtn" class="w-full bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-semibold py-3 px-4 rounded-lg focus:outline-none focus:ring-4 focus:ring-slate-400/50 transition-colors duration-300 flex items-center justify-center space-x-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
@@ -82,130 +97,203 @@
     </div>
 
     <script>
-        // DOM Element References
-        const qrForm = document.getElementById('qrForm');
-        const urlInput = document.getElementById('urlInput');
-        const qrContainer = document.getElementById('qr-container');
-        const qrcodeDiv = document.getElementById('qrcode');
-        const actionButtons = document.getElementById('action-buttons');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const copyBtn = document.getElementById('copyBtn');
-        const copyBtnText = document.getElementById('copyBtnText');
-        const qrFilename = document.getElementById('qr-filename');
-
-        // Initialize QRCode object - will be created on form submit
-        let qrcode = null;
-
-        /**
-         * Handles the form submission to generate the QR code.
-         * @param {Event} e - The form submission event.
-         */
-        qrForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const url = urlInput.value.trim();
-
-            if (!url) {
-                // Visually indicate error if input is empty
-                urlInput.classList.add('border-red-500');
-                urlInput.focus();
-                return;
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            const qrForm = document.getElementById('qrForm');
+            const qrcodeDiv = document.getElementById('qrcode');
+            const qrContainer = document.getElementById('qr-container');
+            const actionButtons = document.getElementById('action-buttons');
+            const qrFilename = document.getElementById('qr-filename');
             
-            // Remove error indication on successful input
-            urlInput.classList.remove('border-red-500');
+            const urlTab = document.getElementById('urlTab');
+            const wifiTab = document.getElementById('wifiTab');
+            const contactTab = document.getElementById('contactTab');
+            const urlSection = document.getElementById('urlSection');
+            const wifiSection = document.getElementById('wifiSection');
+            const contactSection = document.getElementById('contactSection');
 
-            // Clear previous QR code if it exists
-            qrcodeDiv.innerHTML = '';
+            const urlInput = document.getElementById('urlInput');
+            const ssidInput = document.getElementById('ssidInput');
+            const passwordInput = document.getElementById('passwordInput');
+            const encryptionSelect = document.getElementById('encryptionSelect');
+            const hiddenCheckbox = document.getElementById('hiddenCheckbox');
+            const nameInput = document.getElementById('nameInput');
+            const phoneInput = document.getElementById('phoneInput');
+            
+            const downloadBtn = document.getElementById('downloadBtn');
+            const copyBtn = document.getElementById('copyBtn');
+            const copyBtnText = document.getElementById('copyBtnText');
 
-            // Create a new QR Code
-            qrcode = new QRCode(qrcodeDiv, {
-                text: url,
-                width: 256,
-                height: 256,
-                colorDark: '#0f172a', // dark slate
-                colorLight: '#ffffff',
-                correctLevel: QRCode.CorrectLevel.H
+            let qrcode = null;
+            let currentMode = 'url';
+
+            const clearQRCode = () => {
+                qrcodeDiv.innerHTML = '';
+                qrContainer.classList.add('hidden');
+                actionButtons.classList.add('hidden');
+                qrcode = null;
+            };
+            
+            const switchMode = (mode) => {
+                currentMode = mode;
+                clearQRCode();
+                const allTabs = [urlTab, wifiTab, contactTab];
+                const allSections = [urlSection, wifiSection, contactSection];
+                allTabs.forEach(tab => tab.classList.remove('tab-active'));
+                allSections.forEach(section => section.classList.add('hidden'));
+                
+                urlInput.required = false;
+                ssidInput.required = false;
+                nameInput.required = false;
+                phoneInput.required = false;
+
+                if (mode === 'url') {
+                    urlTab.classList.add('tab-active');
+                    urlSection.classList.remove('hidden');
+                    urlInput.required = true;
+                } else if (mode === 'wifi') {
+                    wifiTab.classList.add('tab-active');
+                    wifiSection.classList.remove('hidden');
+                    ssidInput.required = true;
+                } else if (mode === 'contact') {
+                    contactTab.classList.add('tab-active');
+                    contactSection.classList.remove('hidden');
+                    nameInput.required = true;
+                    phoneInput.required = true;
+                }
+            };
+            
+            // --- MODIFIED & IMPROVED FUNCTION FOR BLIND EFFECT ---
+            const generateQRCode = (text, filename, label = '') => {
+                clearQRCode();
+                qrcode = new QRCode(qrcodeDiv, {
+                    text: text, width: 256, height: 256, colorDark: '#0f172a',
+                    colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.H
+                });
+
+                qrFilename.textContent = filename;
+
+                setTimeout(() => {
+                    if (label) {
+                        const qrCanvas = qrcodeDiv.querySelector('canvas');
+                        const qrImg = qrcodeDiv.querySelector('img');
+
+                        let baseImageElement = qrCanvas || qrImg; // Get the QR code source
+
+                        if (baseImageElement) {
+                            const finalCanvas = document.createElement('canvas');
+                            finalCanvas.width = 256;
+                            finalCanvas.height = 256;
+                            const ctx = finalCanvas.getContext('2d');
+                            
+                            // 1. Draw the QR code onto our new canvas
+                            ctx.drawImage(baseImageElement, 0, 0, 256, 256);
+
+                            // 2. Prepare text styling
+                            const fontSize = 16;
+                            ctx.font = `bold ${fontSize}px 'Inter'`;
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            
+                            // 3. Calculate text and background dimensions
+                            const textMetrics = ctx.measureText(label);
+                            const padding = 15; // Padding around the text
+                            const rectWidth = textMetrics.width + padding * 2;
+                            const rectHeight = fontSize + padding; // Height based on font size + padding
+                            const rectX = (finalCanvas.width - rectWidth) / 2;
+                            const rectY = (finalCanvas.height - rectHeight) / 2;
+
+                            // 4. Draw a semi-transparent background rectangle
+                            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)'; // White with 70% opacity
+                            ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+                            
+                            // 5. Draw the text
+                            ctx.fillStyle = '#0f172a'; // Use a dark color for the text
+                            ctx.fillText(label, finalCanvas.width / 2, finalCanvas.height / 2);
+
+                            // Replace the original QR code with our new canvas
+                            qrcodeDiv.innerHTML = '';
+                            qrcodeDiv.appendChild(finalCanvas);
+                        }
+                    }
+
+                    qrContainer.classList.remove('hidden');
+                    actionButtons.classList.remove('hidden');
+                }, 100); 
+            };
+
+            const escapeWifiString = (str) => str.replace(/([\\;,:"])/g, "\\$1");
+
+            urlTab.addEventListener('click', () => switchMode('url'));
+            wifiTab.addEventListener('click', () => switchMode('wifi'));
+            contactTab.addEventListener('click', () => switchMode('contact'));
+
+            qrForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                if (currentMode === 'url') {
+                    const url = urlInput.value.trim();
+                    if (url) {
+                        let label = 'URL'; // Default label for URL
+                        try {
+                            label = new URL(url).hostname.replace(/^www\./, '');
+                            if (label.length > 15) label = label.substring(0, 12) + '...'; // Truncate long labels
+                        } catch (_) {}
+                        generateQRCode(url, `${label}.png`, label);
+                    }
+                } else if (currentMode === 'wifi') {
+                    const ssid = ssidInput.value.trim();
+                    if (ssid) {
+                        const wifiString = `WIFI:T:${encryptionSelect.value};S:${escapeWifiString(ssid)};P:${escapeWifiString(passwordInput.value)};H:${hiddenCheckbox.checked};;`;
+                        const filename = `wifi-${ssid.replace(/\s/g, '_')}.png`;
+                        let label = ssid;
+                        if (label.length > 15) label = label.substring(0, 12) + '...'; // Truncate long labels
+                        generateQRCode(wifiString, filename, label);
+                    }
+                } else if (currentMode === 'contact') {
+                    const fullName = nameInput.value.trim();
+                    const phone = phoneInput.value.trim();
+                    if (fullName && phone) {
+                        const nameParts = fullName.split(' ');
+                        const lastName = nameParts.pop() || '';
+                        const firstName = nameParts.join(' ');
+                        const vCardString = `BEGIN:VCARD\nVERSION:3.0\nN:${lastName};${firstName};;;\nFN:${fullName}\nTEL;TYPE=CELL,VOICE:${phone}\nEND:VCARD`;
+                        const filename = `contact-${fullName.replace(/\s/g, '_')}.png`;
+                        let label = fullName;
+                        if (label.length > 15) label = label.substring(0, 12) + '...'; // Truncate long labels
+                        generateQRCode(vCardString, filename, label);
+                    }
+                }
             });
 
-            // Update filename display
-            try {
-                const hostname = new URL(url).hostname;
-                qrFilename.textContent = `${hostname.replace(/^www\./, '')}.png`;
-            } catch (_) {
-                qrFilename.textContent = 'qrcode.png';
-            }
-
-            // Show the QR code and action buttons with a slight delay for a smoother effect
-            setTimeout(() => {
-                qrContainer.classList.remove('hidden');
-                actionButtons.classList.remove('hidden');
-            }, 100);
-        });
-
-        /**
-         * Handles the download button click.
-         */
-        downloadBtn.addEventListener('click', function() {
-            if (!qrcode) return;
-            
-            // Find the generated image or canvas
-            const qrImage = qrcodeDiv.querySelector('img');
-            const qrCanvas = qrcodeDiv.querySelector('canvas');
-            
-            if (qrImage) {
-                // The library generates an <img> tag, so we can use its src
-                const link = document.createElement('a');
-                link.href = qrImage.src;
-                link.download = qrFilename.textContent || 'qrcode.png';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            } else if (qrCanvas) {
-                // Fallback for canvas if the library uses it
-                const link = document.createElement('a');
-                link.href = qrCanvas.toDataURL('image/png');
-                link.download = qrFilename.textContent || 'qrcode.png';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-        });
-        
-        /**
-         * Handles the copy to clipboard button click.
-         */
-        copyBtn.addEventListener('click', function() {
-            if (!qrcode) return;
-
-            const qrCanvas = qrcodeDiv.querySelector('canvas');
-            if (!qrCanvas) {
-                alert("Could not find QR code canvas to copy.");
-                return;
-            }
-
-            // Use the Clipboard API to copy the image
-            qrCanvas.toBlob(function(blob) {
-                if (navigator.clipboard && navigator.clipboard.write) {
-                    navigator.clipboard.write([
-                        new ClipboardItem({ 'image/png': blob })
-                    ]).then(() => {
-                        // Visual feedback for the user
-                        copyBtnText.textContent = 'Copied!';
-                        setTimeout(() => {
-                            copyBtnText.textContent = 'Copy Image';
-                        }, 2000);
-                    }).catch(err => {
-                        console.error('Failed to copy image to clipboard:', err);
-                        alert('Failed to copy image. Your browser might not support this feature.');
-                    });
-                } else {
-                     // Fallback for older browsers
-                    alert('Copying images to the clipboard is not supported by your browser.');
+            downloadBtn.addEventListener('click', () => {
+                const finalCanvas = qrcodeDiv.querySelector('canvas');
+                if (finalCanvas) {
+                    const link = document.createElement('a');
+                    link.href = finalCanvas.toDataURL('image/png');
+                    link.download = qrFilename.textContent || 'qrcode.png';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
                 }
-            }, 'image/png');
+            });
+
+            copyBtn.addEventListener('click', () => {
+                const finalCanvas = qrcodeDiv.querySelector('canvas');
+                if (!finalCanvas) return alert("QR code not found.");
+                
+                finalCanvas.toBlob((blob) => {
+                    if (navigator.clipboard?.write) {
+                        navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+                            .then(() => {
+                                copyBtnText.textContent = 'Copied!';
+                                setTimeout(() => { copyBtnText.textContent = 'Copy Image'; }, 2000);
+                            }).catch(err => console.error('Failed to copy image:', err));
+                    } else {
+                        alert('Clipboard API not supported by your browser.');
+                    }
+                }, 'image/png');
+            });
         });
-
     </script>
-
 </body>
 </html>
